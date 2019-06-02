@@ -28,10 +28,12 @@ class triviaGame {
         this.solutionButtonID = [$(`#A`), $(`#B`), $(`#C`), $(`#D`)]
         this.ApiLink = "https://opentdb.com/api.php?amount=10&category=18&type=multiple"
         this.correctSolutionIndex;
-        this.defaultTime = 20;
+        this.defaultTime = 60;
         this.time = this.defaultTime;
         this.intervalId
+
         this.questionsArray;
+        this.questionCount = 1;
         this.GetNewquestionArray(this.ApiLink);
         this.solutionAnswered = false;
         this.correct = 0;
@@ -54,15 +56,15 @@ class triviaGame {
         });
     }
 
-//rendering functions
+    //rendering functions
 
-//render a new question with a specific interval
+    //render a new question with a specific interval
     renderNewQuestion(index, time) {
         console.log(`rendering questions ${index}`);
         this.questionDisplayID.text(this.questionsArray[index].question);
         let correctsolution = getRandomInt(4);
         console.log(`correct solution index ${correctsolution}`);
-        this.solutionButtonID[correctsolution].text(this.questionsArray[index].correct_answer).attr('style', "outline: solid black");
+        this.solutionButtonID[correctsolution].text(this.apiDecoder(this.questionsArray[index].correct_answer)).attr('style', "outline: solid black");
         this.correctSolutionIndex = correctsolution;
         //render the incorrect solution buttons
         let incorrectindex = 0;
@@ -70,7 +72,7 @@ class triviaGame {
         for (let i = 0; i < this.solutionButtonID.length; i++) {
             //that is not the correct solutions button id
             if (correctsolution !== i) {
-                this.solutionButtonID[i].text(this.questionsArray[index].incorrect_answers[incorrectindex]).attr('style', "outline: solid black");
+                this.solutionButtonID[i].text(this.apiDecoder(this.questionsArray[index].incorrect_answers[incorrectindex])).attr('style', "outline: solid black");
                 incorrectindex++;
             }
         }
@@ -79,8 +81,8 @@ class triviaGame {
 
     }
 
-//render the solution by coloring the solution outline green and the incorrect solutions red
-    renderSolution(){
+    //render the solution by coloring the solution outline green and the incorrect solutions red
+    renderSolution() {
         this.solutionButtonID[this.correctSolutionIndex].attr('style', "outline: solid green");
         let incorrectindex = 0;
         for (let i = 0; i < this.solutionButtonID.length; i++) {
@@ -110,6 +112,7 @@ class triviaGame {
             alert("You took too long! Automatic lost this question but try another one!");
             that.wrong++
             that.renderSolution();
+            this.solutionAnswered = true;
         }
         if (that.solutionAnswered == true) {
             that.stop();
@@ -120,16 +123,36 @@ class triviaGame {
         clearInterval(that.intervalId);
     }
 
-    questionInputHandler(guessNumber) {
+    solutionInputHandler(guessNumber) {
         if (this.correctSolutionIndex == guessNumber) {
             alert("correct guess");
             this.correct++;
+            this.renderSolution();
+            this.solutionAnswered = true;
+        } else if (this.correctSolutionIndex !== guessNumber) {
+            alert("wrong guess");
+            this.wrong++;
+            this.renderSolution();
+            this.solutionAnswered = true;
         }
-        alert("wrong guess");
-        this.wrong++;
-
     }
 
+    startButtonHandler(){
+        if(this.solutionAnswered == true){
+            this.solutionAnswered = false;
+            if(this.questionCount <= this.questionsArray.length){
+                this.renderNewQuestion(this.questionCount, this.defaultTime);
+                this.questionCount++;
+            }
+            if(this.questionCount == this.questionsArray.length){
+                alert(`game over you got ${this.correct} questions right and ${this.wrong} questions wrong`);
+            }
+        }
+    }
+
+    apiDecoder(theString){
+        return $('<textarea />').html(theString).text();
+    }
     //end of class here
 }
 //end of class here 
@@ -139,22 +162,27 @@ var that = Game;
 
 $(document).on('click', '#start', function () {
     console.log("starting game with new question");
+    Game.startButtonHandler();
 
 });
 
 $(document).on('click', '#A', function () {
     console.log("you clicked A 0");
+    Game.solutionInputHandler(0);
 
 });
 $(document).on('click', '#B', function () {
     console.log("you clicked B 1");
+    Game.solutionInputHandler(1);
 
 });
 $(document).on('click', '#C', function () {
     console.log("You clicked C 2");
+    Game.solutionInputHandler(2);
 
 });
 $(document).on('click', '#D', function () {
     console.log("you clicked D 3");
+    Game.solutionInputHandler(3);
 
 });

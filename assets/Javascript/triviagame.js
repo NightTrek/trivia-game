@@ -19,14 +19,20 @@ var getRandomInt = function (max) {
 // #C
 // #D
 
+// any catagory multiple choice 15 questions 
+// https://opentdb.com/api.php?amount=16&type=multiple
+//easier viersion of above
+//https://opentdb.com/api.php?amount=16&difficulty=easy&type=multiple
 
+//computers multiple choice 11 questions
+//https://opentdb.com/api.php?amount=11&category=18&type=multiple
 
 class triviaGame {
     constructor() {
         this.questionDisplayID = $(`#question`);
         this.timeID = $(`#time`);
         this.solutionButtonID = [$(`#A`), $(`#B`), $(`#C`), $(`#D`)]
-        this.ApiLink = "https://opentdb.com/api.php?amount=10&category=18&type=multiple"
+        this.ApiLink = "https://opentdb.com/api.php?amount=16&difficulty=easy&type=multiple"
         this.correctSolutionIndex;
         this.defaultTime = 60;
         this.time = this.defaultTime;
@@ -61,7 +67,7 @@ class triviaGame {
     //render a new question with a specific interval
     renderNewQuestion(index, time) {
         console.log(`rendering questions ${index}`);
-        this.questionDisplayID.text(this.questionsArray[index].question);
+        this.questionDisplayID.text(this.apiDecoder(this.questionsArray[index].question));
         let correctsolution = getRandomInt(4);
         console.log(`correct solution index ${correctsolution}`);
         this.solutionButtonID[correctsolution].text(this.apiDecoder(this.questionsArray[index].correct_answer)).attr('style', "outline: solid black");
@@ -146,6 +152,7 @@ class triviaGame {
             }
             if(this.questionCount == this.questionsArray.length){
                 alert(`game over you got ${this.correct} questions right and ${this.wrong} questions wrong`);
+                this.stop();
             }
         }
     }

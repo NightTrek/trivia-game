@@ -28,7 +28,7 @@ class triviaGame {
         this.solutionButtonID = [$(`#A`), $(`#B`), $(`#C`), $(`#D`)]
         this.ApiLink = "https://opentdb.com/api.php?amount=10&category=18&type=multiple"
         this.correctSolutionIndex;
-        this.defaultTime = 120;
+        this.defaultTime = 20;
         this.time = this.defaultTime;
         this.intervalId
         this.questionsArray;
@@ -50,17 +50,19 @@ class triviaGame {
             let results = response.results;
             console.log(results);
             that.questionsArray = results;
-            that.renderNewQuestion(0, this.defaultTime);
+            that.renderNewQuestion(0, that.defaultTime);
         });
     }
 
+//rendering functions
 
+//render a new question with a specific interval
     renderNewQuestion(index, time) {
         console.log(`rendering questions ${index}`);
         this.questionDisplayID.text(this.questionsArray[index].question);
         let correctsolution = getRandomInt(4);
         console.log(`correct solution index ${correctsolution}`);
-        this.solutionButtonID[correctsolution].text(this.questionsArray[index].correct_answer);
+        this.solutionButtonID[correctsolution].text(this.questionsArray[index].correct_answer).attr('style', "outline: solid black");
         this.correctSolutionIndex = correctsolution;
         //render the incorrect solution buttons
         let incorrectindex = 0;
@@ -68,7 +70,7 @@ class triviaGame {
         for (let i = 0; i < this.solutionButtonID.length; i++) {
             //that is not the correct solutions button id
             if (correctsolution !== i) {
-                this.solutionButtonID[i].text(this.questionsArray[index].incorrect_answers[incorrectindex])
+                this.solutionButtonID[i].text(this.questionsArray[index].incorrect_answers[incorrectindex]).attr('style', "outline: solid black");
                 incorrectindex++;
             }
         }
@@ -77,12 +79,26 @@ class triviaGame {
 
     }
 
+//render the solution by coloring the solution outline green and the incorrect solutions red
+    renderSolution(){
+        this.solutionButtonID[this.correctSolutionIndex].attr('style', "outline: solid green");
+        let incorrectindex = 0;
+        for (let i = 0; i < this.solutionButtonID.length; i++) {
+            //that is not the correct solutions button id
+            if (that.correctSolutionIndex !== i) {
+                this.solutionButtonID[i].attr('style', "outline: solid red");
+                incorrectindex++;
+            }
+        }
+
+    }
+
     // start timer
     startInterval(timeForQuestion) {
-        this.time = 120;
-        clearInterval(this.intervalId);
-        that.timeID.text(`Time left: ${this.time}`);
-        this.intervalId = setInterval(that.decrement, 1000);
+        that.time = timeForQuestion;
+        clearInterval(that.intervalId);
+        that.timeID.text(`Time left: ${that.time}`);
+        that.intervalId = setInterval(that.decrement, 1000);
     }
 
     decrement() {
@@ -93,6 +109,7 @@ class triviaGame {
             that.stop();
             alert("You took too long! Automatic lost this question but try another one!");
             that.wrong++
+            that.renderSolution();
         }
         if (that.solutionAnswered == true) {
             that.stop();
@@ -105,9 +122,12 @@ class triviaGame {
 
     questionInputHandler(guessNumber) {
         if (this.correctSolutionIndex == guessNumber) {
-
-
+            alert("correct guess");
+            this.correct++;
         }
+        alert("wrong guess");
+        this.wrong++;
+
     }
 
     //end of class here

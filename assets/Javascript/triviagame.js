@@ -118,7 +118,7 @@ class triviaGame {
             alert("You took too long! Automatic lost this question but try another one!");
             that.wrong++
             that.renderSolution();
-            this.solutionAnswered = true;
+            that.solutionAnswered = true;
         }
         if (that.solutionAnswered == true) {
             that.stop();

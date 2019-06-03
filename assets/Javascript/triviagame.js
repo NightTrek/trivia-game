@@ -40,13 +40,25 @@ class triviaGame {
 
         this.questionsArray;
         this.questionCount = 1;
-        this.GetNewquestionArray(this.ApiLink);
         this.solutionAnswered = false;
         this.correct = 0;
         this.wrong = 0;
 
     }
 
+    // cat is a number between 0 - 20
+    //dif is "easy" "medium" 'hard'
+    linkBuilder(cat, diff){
+        if (cat !== undefined && diff !== undefined){
+            return `https://opentdb.com/api.php?amount=16&category=${cat}&difficulty=${diff}&type=multiple`
+        }
+        if(cat == undefined&& diff !== undefined){
+            return `https://opentdb.com/api.php?amount=16&difficulty=${diff}&type=multiple`
+        }
+        if(cat !== undefined && diff == undefined){
+            return `https://opentdb.com/api.php?amount=16&category=${cat}&type=multiple`
+        }
+    }
     //Async ajax call to get new questions from question API
     //working 
     GetNewquestionArray(link) {
@@ -66,10 +78,8 @@ class triviaGame {
 
     //render a new question with a specific interval
     renderNewQuestion(index, time) {
-        console.log(`rendering questions ${index}`);
         this.questionDisplayID.text(this.apiDecoder(this.questionsArray[index].question));
         let correctsolution = getRandomInt(4);
-        console.log(`correct solution index ${correctsolution}`);
         this.solutionButtonID[correctsolution].text(this.apiDecoder(this.questionsArray[index].correct_answer)).attr('style', "outline: solid black");
         this.correctSolutionIndex = correctsolution;
         //render the incorrect solution buttons
@@ -165,12 +175,18 @@ class triviaGame {
 //end of class here 
 
 var Game = new triviaGame();
+var gamestart = false;
 var that = Game;
 
 $(document).on('click', '#start', function () {
     console.log("starting game with new question");
+    if(gamestart == true){
     Game.startButtonHandler();
-
+    }
+    if(gamestart == false){
+        Game.GetNewquestionArray(Game.ApiLink);
+        gamestart = true;
+    }
 });
 
 $(document).on('click', '#A', function () {

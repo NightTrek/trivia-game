@@ -128,7 +128,7 @@ class triviaGame {
         that.timeID.text(`Time left: ${that.time}`);
         if (that.time <= 0) {
             that.stop();
-            alert("You took too long! Automatic lost this question but try another one!");
+            that.handleModal('3');
             that.wrong++
             that.renderSolution();
             that.solutionAnswered = true;
@@ -159,7 +159,9 @@ class triviaGame {
     handleModal(string) {
         console.log('handling modal switch');
         setTimeout(function(){
+            if(string !== 2){
             $.modal.close();
+            }
         }, 2000);
         //correct
         if (string === '1') {
@@ -183,6 +185,14 @@ class triviaGame {
             $("#input").html(`<h4> You finished Good job!</h4> <hr>
                     <p> You got ${this.correct} correct and ${this.wrong} wrong </p> <button  id="CloseModal" value="close">Close</button>
                     <button  id="restart">restart</button>`);
+        }
+        else if (string === '3') {
+            this.modal.modal({
+                fadeDuration: 500
+            });
+            $("#input").html(`<h4> You took too long!</h4> <hr>
+                    <p> Try to answer the questions in the alloted time. Do you best its just a game 
+                    set on easy dont worry </p> <button  id="CloseModal" value="close">Close</button>`);
         }
 
     }

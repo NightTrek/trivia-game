@@ -32,7 +32,7 @@ class triviaGame {
         this.questionDisplayID = $(`#question`);
         this.timeID = $(`#time`);
         this.solutionButtonID = [$(`#A`), $(`#B`), $(`#C`), $(`#D`)]
-        this.ApiLink = "https://opentdb.com/api.php?amount=11&difficulty=hard&type=multiple"
+        this.ApiLink = "https://opentdb.com/api.php?amount=11&difficulty=easy&type=multiple"
         this.correctSolutionIndex;
         this.defaultTime = 60;
         this.time = this.defaultTime;

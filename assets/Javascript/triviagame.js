@@ -225,7 +225,7 @@ var Game = new triviaGame();
 var gamestart = false;
 var that = Game;
 
-$(document).on('click', '#start', function () {
+$(document).on('click touchstart', '#start', function () {
     if (gamestart == true) {
         Game.startButtonHandler();
     }
@@ -236,32 +236,32 @@ $(document).on('click', '#start', function () {
     }
 });
 
-$(document).on('click', '#A', function () {
+$(document).on('click touchstart', '#A', function () {
     console.log("you clicked A 0");
     Game.solutionInputHandler(0);
 
 });
-$(document).on('click', '#B', function () {
+$(document).on('click touchstart', '#B', function () {
     console.log("you clicked B 1");
     Game.solutionInputHandler(1);
 
 });
-$(document).on('click', '#C', function () {
+$(document).on('click touchstart', '#C', function () {
     console.log("You clicked C 2");
     Game.solutionInputHandler(2);
 
 });
-$(document).on('click', '#D', function () {
+$(document).on('click touchstart', '#D', function () {
     console.log("you clicked D 3");
     Game.solutionInputHandler(3);
 
 });
 
-$(document).on('click', "#CloseModal", function(){
+$(document).on('click touchstart', "#CloseModal", function(){
 $.modal.close();
 });
 
-$(document).on('click', "#restart", function(){
+$(document).on('click touchstart', "#restart", function(){
 Game.GetNewquestionArray(Game.ApiLink);
 $.modal.close();
 

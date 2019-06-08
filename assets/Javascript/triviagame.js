@@ -32,30 +32,32 @@ class triviaGame {
         this.questionDisplayID = $(`#question`);
         this.timeID = $(`#time`);
         this.solutionButtonID = [$(`#A`), $(`#B`), $(`#C`), $(`#D`)]
-        this.ApiLink = "https://opentdb.com/api.php?amount=16&difficulty=easy&type=multiple"
+        this.ApiLink = "https://opentdb.com/api.php?amount=6&difficulty=easy&type=multiple"
         this.correctSolutionIndex;
         this.defaultTime = 60;
         this.time = this.defaultTime;
         this.intervalId
 
         this.questionsArray;
-        this.questionCount = 1;
+        this.questionCount = 0;
         this.solutionAnswered = false;
         this.correct = 0;
         this.wrong = 0;
+        this.gameOver = false;
+        this.modal = $('#final');
 
     }
 
     // cat is a number between 0 - 20
     //dif is "easy" "medium" 'hard'
-    linkBuilder(cat, diff){
-        if (cat !== undefined && diff !== undefined){
+    linkBuilder(cat, diff) {
+        if (cat !== undefined && diff !== undefined) {
             return `https://opentdb.com/api.php?amount=16&category=${cat}&difficulty=${diff}&type=multiple`
         }
-        if(cat == undefined&& diff !== undefined){
+        if (cat == undefined && diff !== undefined) {
             return `https://opentdb.com/api.php?amount=16&difficulty=${diff}&type=multiple`
         }
-        if(cat !== undefined && diff == undefined){
+        if (cat !== undefined && diff == undefined) {
             return `https://opentdb.com/api.php?amount=16&category=${cat}&type=multiple`
         }
     }
@@ -63,6 +65,8 @@ class triviaGame {
     //working 
     GetNewquestionArray(link) {
         console.log('making Ajax call to get questions');
+        this.correct = 0;
+        this.wrong = 0;
         $.ajax({
             url: link,
             method: "GET"
@@ -121,7 +125,6 @@ class triviaGame {
 
     decrement() {
         that.time--;
-        console.log(that.time);
         that.timeID.text(`Time left: ${that.time}`);
         if (that.time <= 0) {
             that.stop();
@@ -141,33 +144,67 @@ class triviaGame {
 
     solutionInputHandler(guessNumber) {
         if (this.correctSolutionIndex == guessNumber) {
-            alert("correct guess");
             this.correct++;
+            this.handleModal('1');
             this.renderSolution();
             this.solutionAnswered = true;
         } else if (this.correctSolutionIndex !== guessNumber) {
-            alert("wrong guess");
             this.wrong++;
+            this.handleModal('0');
             this.renderSolution();
             this.solutionAnswered = true;
         }
     }
 
-    startButtonHandler(){
-        if(this.solutionAnswered == true){
+    handleModal(string) {
+        console.log('handling modal switch');
+        setTimeout(function(){
+            $.modal.close();
+        }, 2000);
+        //correct
+        if (string === '1') {
+            this.modal.modal({
+                fadeDuration: 500,
+            });
+            $("#input").html(`<h4> you are correct.... This time</h4> <hr> <button id="CloseModal" value="close">
+                Close
+            </button>`);
+        } //wrong
+        else if (string === '0') {
+            this.modal.modal({
+                fadeDuration: 500
+            });
+            $("#input").html(`<h4> Yall wrong</h4> <hr> <button id="CloseModal" value="close">Close</button>`);
+        }//final modal 
+        else if (string === '2') {
+            this.modal.modal({
+                fadeDuration: 500
+            });
+            $("#input").html(`<h4> You finished Good job!</h4> <hr>
+                    <p> You got ${this.correct} correct and ${this.wrong} wrong </p> <button  id="CloseModal" value="close">Close</button>
+                    <button  id="restart">restart</button>`);
+        }
+
+    }
+
+
+
+    startButtonHandler() {
+        if (this.solutionAnswered == true) {
             this.solutionAnswered = false;
-            if(this.questionCount <= this.questionsArray.length){
+            if (this.questionCount < this.questionsArray.length) {
                 this.renderNewQuestion(this.questionCount, this.defaultTime);
                 this.questionCount++;
             }
-            if(this.questionCount == this.questionsArray.length){
-                alert(`game over you got ${this.correct} questions right and ${this.wrong} questions wrong`);
+            else{
+                console.log('printing final modal');
+                this.handleModal('2');
                 this.stop();
             }
         }
     }
 
-    apiDecoder(theString){
+    apiDecoder(theString) {
         return $('<textarea />').html(theString).text();
     }
     //end of class here
@@ -179,11 +216,11 @@ var gamestart = false;
 var that = Game;
 
 $(document).on('click', '#start', function () {
-    console.log("starting game with new question");
-    if(gamestart == true){
-    Game.startButtonHandler();
+    if (gamestart == true) {
+        Game.startButtonHandler();
     }
-    if(gamestart == false){
+    if (gamestart == false) {
+        console.log("starting game with new question");
         Game.GetNewquestionArray(Game.ApiLink);
         gamestart = true;
     }
@@ -207,5 +244,15 @@ $(document).on('click', '#C', function () {
 $(document).on('click', '#D', function () {
     console.log("you clicked D 3");
     Game.solutionInputHandler(3);
+
+});
+
+$(document).on('click', "#CloseModal", function(){
+$.modal.close();
+});
+
+$(document).on('click', "#restart", function(){
+Game.GetNewquestionArray(Game.ApiLink);
+$.modal.close();
 
 });
